@@ -20,11 +20,11 @@ All commands to execute the dedalus and plotting scripts are gathered in the `ru
 
 Example: you want to run a simulation with a vertical viscosity nu=1e-4 m2/s and a Rossby number Ro=-1.1 (the values we used in the article). If executing for the first time, execute
 
-```$ bash run-one-exp.bash 1e-4 -1.1 X```
+`$ bash run-one-exp.bash 1e-4 -1.1 X`
 
 where `X` can be anything, this flag being just an instruction to execute dedalus. You can change more parameters directly in `dedalus_1D.py`. If you already ran the simulation and only wish to modify a plotting script (`EII_plots.py` or `EL_plots.py`), you will save yourself some time by omitting the third argument `X`:
 
-```$ bash run-one-exp.bash 1e-4 -1.1```
+`$ bash run-one-exp.bash 1e-4 -1.1`
 
 If you have Ro<-1, the script will call `EII_plots.py`. If not, it will call `EL_plots.py`.
 If you change either, do your changes in the file at the root of the repo, `run-one-exp` will do the rest.
