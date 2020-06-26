@@ -1,0 +1,14 @@
+*~
+*.png
+*.jpg
+*.pdf
+*.h5
+*.mov
+*.mp4
+EXP_*
+ipynb_checkpoints
+.ipynb_checkpoints
+*.npz
+*.npy
+*#
+.DS_Store
