@@ -364,11 +364,11 @@ fg5.subplots_adjust(hspace=0.05)
 
 # Saving figures -------------------------------------------------------------|
 if saveYN:
-    fg1.savefig(os.path.join(figpth, 'UV_of_z.pdf'), bbox_inches='tight')
-    fg2.savefig(os.path.join(figpth, 'UV_of_t.pdf'), bbox_inches='tight')
-    fg3.savefig(os.path.join(figpth, 'sigmaU_of_t.pdf'), bbox_inches='tight')
-    fg4.savefig(os.path.join(figpth, 'hodograph.pdf'), bbox_inches='tight')
-    fg5.savefig(os.path.join(figpth, 'energetics.pdf'), bbox_inches='tight')
+    fg1.savefig(os.path.join(figpth, 'UV_of_z.eps'), bbox_inches='tight')
+    fg2.savefig(os.path.join(figpth, 'UV_of_t.eps'), bbox_inches='tight')
+    fg3.savefig(os.path.join(figpth, 'sigmaU_of_t.eps'), bbox_inches='tight')
+    fg4.savefig(os.path.join(figpth, 'hodograph.eps'), bbox_inches='tight')
+    fg5.savefig(os.path.join(figpth, 'energetics.eps'), bbox_inches='tight')
 else:
     plt.show()
 
