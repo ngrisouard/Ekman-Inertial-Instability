@@ -6,10 +6,16 @@ All code, supporting the manuscript "Ekman-Inertial Instability" by Grisouard & 
 * All code can run on a personal machine and does not require a supercomputer.
 * A Python distribution, with common packages such at NumPy, SciPy, Matplotlib...
 * the in-line text editor `ed` if you wish to use the `run-one-exp.bash` script.
-* Dedalus: see http://dedalus-project.org/. The version we used was ``.
+* Dedalus: see http://dedalus-project.org/. The version we used was `2.1810` (see `venv_list.txt`).
+
+## Contents
+* `run-one-exp.bash`: a list of commands to run one experiments (see 'Execution').
+* `dedalus_1D.py`: the dedalus script to run a simulation.
+* `EII_plots.py`: python script to plot the results of a simulation and compare it with the analytical solution. This plot can reproduce the figures of the article.
+* `EL_plots.py`: same as `EII_plots.py`, but tuned to the transient Ekman layer solution.
+* `venv_list.txt`: output of `$ conda list`.
 
 ## Execution
-
 All commands to execute the dedalus and plotting scripts are gathered in the `run-one-exp.bash` file. Adapt them to your OS or shell as needed, or run as such.
 
 Example: you want to run a simulation with a vertical viscosity nu=1e-4 m2/s and a Rossby number Ro=-1.1 (the values we used in the article). If executing for the first time, execute
