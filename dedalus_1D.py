@@ -2,11 +2,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-Our CISI front in 1D: the evolution in time of fields that don't depend on $x$
-I will use to solve the 1D problem as described by Barbara in
-EkmanLayer_analytics with Dedalus directly, and different boundary conditions.
+Nicolas Grisouard, University of Toronto, Department of Physics.
+July 2020
 
-This script only solves the problem with dedalus. For figure printing, see
+This script solves the problem with dedalus. For figure printing, see
 other scripts.
 """
 
@@ -49,7 +48,8 @@ nz = 256
 buoy_YN = False  # Compute advection of lateral buoyancy gradient?
 vpi = 0.1  # f/N0
 Ri = 1.
-betab = 1.
+betab = 1.  # buoyancy flux scalar; irrelevant
+
 if Ro >= -1.:
     F = f*np.sqrt(1+Ro)
 else:
@@ -61,13 +61,14 @@ dtM = 1e-2/F
 sigma_dt = F
 t_end = 15/F
 
+Anoise = 1e-6  # amplitude of noise
 
 # Ancilliary dimensional numbers ---------------------------------------------|
 dE = (2*nu/f)**.5
 DE = (2*nu/F)**.5
 H = 15*DE  # H is fixed (50*dE for nu=1e-4)
 
-# numbers related to stratification
+# numbers related to stratification (remotely relevant)
 N02 = (f/vpi)**2
 M02 = f*(N02/Ri)**.5
 
@@ -94,7 +95,7 @@ pb.parameters['Ro'] = Ro
 pb.parameters['M02'] = M02
 if buoy_YN:
     pb.parameters['N02'] = N02
-    pb.parameters['betab'] = betab
+    pb.parameters['betab'] = betab  # irrelevant here
 
 pb.add_equation("dt(u) - nu*dz(uz) - f*v = 0")
 pb.add_equation("dt(v) - nu*dz(vz) + f*(1+Ro)*u = 0")
@@ -112,34 +113,34 @@ pb.add_bc("left(vz) = 0")  # restores mean stress
 # the -1 is because I define v differently in the code (fluctuations).
 pb.add_bc("right(vz) = -M02/f")
 if buoy_YN:
-    pb.add_bc("right(bz) = (betab - 1.)*N02")
+    pb.add_bc("right(bz) = (betab - 1.)*N02")  # irrelevant here
     pb.add_bc("left(bz) = 0")  # restores mean strat
 
 
 # Build solver ---------------------------------------------------------------|
-solver = pb.build_solver(de.timesteppers.RK443)
+solver = pb.build_solver(de.timesteppers.RK443)  # 4th-order Runge-Kutta
 logger.info('Solver built')
 
 # Initial conditions for u
 u = solver.state['u']
 uz = solver.state['uz']
-noise_u = global_noise(domain, scale=1, frac=0.25)  # below is original
-pert = 1e-6 * noise_u  # * (-z) * (z + H)
+noise_u = global_noise(domain, scale=1, frac=0.25)
+pert = Anoise * noise_u
 u['g'] = pert
 u.differentiate('z', out=uz)
 
 # Initial conditions for v
 v = solver.state['v']  # initial condition for v
-vz = solver.state['vz']  # maybe we can get rid of this
-noise_v = global_noise(domain, scale=1, frac=0.25)  # below is original
-pert = 1e-6 * noise_v  # * (-z) * (z + H)
+vz = solver.state['vz']
+noise_v = global_noise(domain, scale=1, frac=0.25)
+pert = Anoise * noise_v
 v['g'] = pert
 v.differentiate('z', out=vz)
 
 if buoy_YN:
     # Initial conditions for b
     b = solver.state['b']  # initial condition for b
-    bz = solver.state['bz']  # maybe we can get rid of this
+    bz = solver.state['bz']
     b.differentiate('z', out=vz)
 
 # Integration parameters
@@ -159,7 +160,7 @@ except:
 
 snapshots = solver.evaluator.add_file_handler(  # everything
     'snapshots', sim_dt=Tf/10, mode='append', max_writes=32)
-snapshots.add_system(solver.state)  # maybe not useful to print out everything
+snapshots.add_system(solver.state)
 
 anim = solver.evaluator.add_file_handler(
     'anim', sim_dt=Tf/40, mode='append')

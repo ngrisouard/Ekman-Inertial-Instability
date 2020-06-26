@@ -2,9 +2,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-Our CISI front in 1D: the evolution in time of fields that don't depend on $x$
-I will use to solve the 1D problem as described by Barbara in
-EkmanLayer_analytics with Dedalus directly, and different boundary conditions.
+Nicolas Grisouard, University of Toronto, Department of Physics.
+June 2020
+
+Ekman-Inertial Instability
 """
 
 import os
@@ -42,7 +43,7 @@ def mUd_closed(T, Z):
 
 
 def mV_closed(T, Z):
-    """ $ V^\dagger$ for an impulse forcing """
+    """ $V$ for an impulse forcing """
     sq2 = np.sqrt(2)
     A = (np.exp(Z*sq2)*erfc(-Z/(2*T)**.5 - T**.5) -
          np.exp(-Z*sq2)*erfc(-Z/(2*T)**.5 + T**.5))/(2*sq2)
@@ -50,52 +51,29 @@ def mV_closed(T, Z):
 
 
 def mUd_surf(T):
-    """ $ U^\dagger$ for an impulse forcing at the surface """
+    """ surface $U^\dagger$ for an impulse forcing  """
     A = (2/np.pi)**.5*dawsn(T**.5)
-    # A[np.isnan(A)] = 0
     return A
 
 
 def mV_surf(T):
-    """ $ V^\dagger$ for an impulse forcing at the surface """
+    """ surface $V$ for an impulse forcing """
     A = erf(T**.5)/2**.5
     return A
 
 
 def sigma_mU_closed(T, Z):
-    """ growth rate of $ U^\dagger$ for an impulse forcing """
+    """ growth rate of $U^\dagger$ for an impulse forcing """
     dmUdt = (2*np.pi*T)**(-0.5) * np.exp(- Z**2/(2*T))  # omitting exp(T)
-    # dmUdt[np.isnan(dmUdt)] = 0
     mU = mUd_closed(T, Z)  # omitting exp(T)
     return dmUdt/mU
 
 
-def sigma_mV_closed(T, Z):
-    """ $ V^\dagger$ for an impulse forcing """
-    dmVdt = (2*np.pi*T)**(-0.5) * np.exp(- T - Z**2/(2*T))
-    # dmVdt[np.isnan(dmVdt)] = 0
-    mV = mV_closed(T, Z)
-    return dmVdt/mV
-
-
 def sigma_mU_surf(T):
-    """ growth rate of $ U^\dagger$ for an impulse forcing """
-    # A = quad(lambda x:
-    #          np.exp(-x)*np.exp(-Z**2/(2*(T-x)))/np.sqrt(2*np.pi*(T-x)), 0, T)
+    """ surface growth rate of $U^\dagger$ for an impulse forcing"""
     dmUdt = (2*np.pi*T)**(-0.5)  # we omit multiplication by exp(T)
-    # dmUdt[np.isnan(dmUdt)] = 0
     mU = mUd_surf(T)  # we omit multiplication by exp(T)
     return dmUdt/mU
-
-
-def sigma_mV_surf(T):
-    """ $ V^\dagger$ for an impulse forcing """
-    # A = quad(lambda x:
-    #          np.exp(-x)*np.exp(-Z**2/(2*(T-x)))/np.sqrt(2*np.pi*(T-x)), 0, T)
-    dmVdt = -(2*np.pi*T)**(-0.5) * np.exp(-T)
-    # dmVdt[np.isnan(dmVdt)] = 0
-    mV = mV_surf(T)
-    return dmVdt/mV
 
 
 def find_nearest(arr, val):
@@ -109,7 +87,7 @@ plt.close('all')
 
 
 # Basic parameters -----------------------------------------------------------|
-Ro = xRox
+Ro = xRox  # Rossby number
 f = 1.e-4  # [rad/s] Coriolis
 nu = xnux  # [m2/s]  vertical viscosity
 nz = 256
@@ -117,39 +95,47 @@ nz = 256
 tskp = 10  # when plotting crosses of numerical simulations, skip every tskp
 zskp = 8  # when plotting crosses of numerical simulations, skip every zskp
 
-depths = [0., -1., -2., -5.]  # in DE
-instants = [0.1, .854, 2., 15.]  # in tF
+depths = [0., -1., -2., -5.]  # in units of DE
+instants = [0.1, .854, 2., 15.]  # in units of 1/F
 ite = 30  # iteration to display the early stage of instability
 
 ftsz = 12
-saveYN = True
+saveYN = False  # set True to print pics (will have to change the figpath)
 dpi = 150
 
 mf = tckr.ScalarFormatter(useMathText=True)
 mf.set_powerlimits((-2, 2))  # to not have crazy numbers of zeroes
 
-rc('font',
+rc('font',  # never really worked
    **{'family': 'sans-serif', 'sans-serif': ['Helvetica'], 'size': ftsz})
 rc('text', usetex=True)
 # clrs = ['C{}'.format(str(i)) for i in range(10)]
-clrs = ['0.', '0.5', '0.65', '0.8']
+clrs = ['0.', '0.5', '0.65', '0.8']  # grey scales
 # ['{}'.format(str(i)) for i in np.linspace(0., 0.9, 4)]
 
 
 # Ancilliary dimensional numbers ---------------------------------------------|
-if Ro < -1.:
-    alpha = np.sqrt(-1-Ro)
-else:
-    alpha = np.sqrt(1+Ro)
+alpha = np.sqrt(-1-Ro)
 F = f*alpha
 TF = 2*np.pi/F
 Tf = 2*np.pi/f
 dE = (2*nu/f)**.5
 DE = (2*nu/F)**.5
-H = 20*DE  # H is fixed (50*dE for nu=1e-4)
+
+# OPEN PARENTHESIS ----------
+# This procedure is a remnant of an old configuration. Particular values don't
+# matter in a linear framework.
+# numbers related to stratification
+vpi = 0.1  # f/N0
+N02 = (f/vpi)**2
+Ri = 1.
+M02 = f*(N02/Ri)**.5
+vz0 = -M02/f
+A0 = vz0*DE/alpha  # This value has to match what is in Dedalus
+# CLOSE PARENTHESIS ---------
 
 hmpth = os.path.expanduser("~")
-figpth = os.path.join(
+figpth = os.path.join(  # EII pics go somewhere
     hmpth, "Dropbox/Applications/Overleaf/Ekman Inertial Instability/figures")
 if not os.path.isdir(figpth):
     os.mkdir(figpth)
@@ -170,53 +156,32 @@ fid.close()
 
 mU = u + v/alpha
 mUd = mU*np.exp(-F*tz)
+mUt = ut + vt/alpha
 mV = - u + v/alpha
 
-mUt = ut + vt/alpha
-
-z = zt[:, 0]
-t = tz[0, :]
-
-Z = z/DE
-T = t*F
-
-ZT = zt/DE
-TZ = tz*F
+z, t = zt[:, 0], tz[0, :]
+Z, T = z/DE, t*F
+ZT, TZ = zt/DE, tz*F
 
 
 # theoretical fields ---------------------------------------------------------|
 mUd_th = mUd_closed(TZ, ZT)
 mV_th = mV_closed(TZ, ZT)
-mUd_th[:, 0] = 0.
-mV_th[:, 0] = 0.
+mUd_th[:, 0] = 0.  # Fixes NaN
+mV_th[:, 0] = 0.  # Fixes NaN
 
 mUd0_th = mUd_surf(T)
 mV0_th = mV_surf(T)
-mUd0_th[0] = 0.
-mV0_th[0] = 0.
+mUd0_th[0] = 0.  # Fixes NaN
+mV0_th[0] = 0.  # Fixes NaN
 
 sigma_mU_th = sigma_mU_closed(TZ, ZT)
-sigma_mV_th = sigma_mV_closed(TZ, ZT)
-
 sigma_mU0_th = sigma_mU_surf(T)
-sigma_mV0_th = sigma_mV_surf(T)
 
 mU_th = mUd_th*np.exp(TZ)
 
 u_th = 0.5*(mU_th - mV_th)
 v_th = 0.5*(mU_th + mV_th)*alpha
-
-# OPEN PARENTHESIS ----------
-# This procedure is a remnant of an old configuration. Particular values don't
-# matter in a linear framework.
-# numbers related to stratification
-vpi = 0.1  # f/N0
-N02 = (f/vpi)**2
-Ri = 1.
-M02 = f*(N02/Ri)**.5
-vz0 = -M02/f
-A0 = vz0*DE/alpha  # This value has to match what is in Dedalus
-# CLOSE PARENTHESIS ---------
 
 
 # Fig. 1: comparison theory/numerics, Z-profiles -----------------------------|
@@ -301,7 +266,7 @@ fg3.subplots_adjust(hspace=0.0)  # I think 0 is the minimum
 
 
 # t-evolution of \vec{v} -----------------------------------------------------|
-# fg4 = plt.figure(figsize=(10, 5), dpi=dpi, constrained_layout=True)
+# Messy
 
 fg4 = plt.figure(figsize=(5.8, 3.5), dpi=dpi)
 gs = fg4.add_gridspec(nrows=1, ncols=3)
@@ -317,7 +282,7 @@ for ii, this_it in enumerate([ite, 4*ite]):
                  label='$z/\delta = 0$')
     ax4[ii].set_aspect('equal')
     ax4[ii].set_xlabel('$u/A_0$')
-    # ax4[ii].set_title('Up to $Ft={0:.1f}$'.format(T[this_it]))
+
 
 this_it = ite-1
 ax4[0].annotate(
@@ -371,15 +336,6 @@ ax4[1].annotate(
                     width=.5, headwidth=3, headlength=4))
 ax4[1].legend(loc='lower right')
 
-# ax41.plot(u[-1, :4*ite]/A0, v[-1, :4*ite]/A0, '+', color=clrs[0])
-# ax41.plot(u_th[-1, :4*ite], v_th[-1, :4*ite], color=clrs[0])
-# ax41.set_aspect('equal')
-# ax41.set_xlabel('$u/A_0$')
-# ax41.set_ylabel('$v/A_0$')
-# ax41.set_title('Up to $Ft={0:.1f}$'.format(T[4*ite]))
-# # ax4.set_title('at the surface')
-# ax41.grid()
-
 plt.tight_layout()
 fg4.subplots_adjust(wspace=0.05)
 
@@ -408,8 +364,8 @@ fg5.subplots_adjust(hspace=0.05)
 
 # Saving figures -------------------------------------------------------------|
 if saveYN:
-    fg1.savefig(os.path.join(figpth, 'UV_of_z.eps'), bbox_inches='tight')
-    fg2.savefig(os.path.join(figpth, 'UV_of_t.eps'), bbox_inches='tight')
+    fg1.savefig(os.path.join(figpth, 'UV_of_z.pdf'), bbox_inches='tight')
+    fg2.savefig(os.path.join(figpth, 'UV_of_t.pdf'), bbox_inches='tight')
     fg3.savefig(os.path.join(figpth, 'sigmaU_of_t.pdf'), bbox_inches='tight')
     fg4.savefig(os.path.join(figpth, 'hodograph.pdf'), bbox_inches='tight')
     fg5.savefig(os.path.join(figpth, 'energetics.pdf'), bbox_inches='tight')

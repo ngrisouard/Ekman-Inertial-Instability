@@ -1,10 +1,10 @@
 #!/bin/bash
 # arguments:
-# $1: value of viscosity
+# $1: value of viscosity in m2/s
 # $2: value of Ro (including negative sign if any)
 # $3: if there is a 3rd argument, we run Dedalus
 
-crit=-1.
+crit=-1.  # critical Rossby number; decides if EL or EII
 if (( $(echo "$2 > $crit" |bc -l) )); then
     echo '>>> Ro='$2', this is an Ekman spiral <<<'
     plotname=EL_plots.py
