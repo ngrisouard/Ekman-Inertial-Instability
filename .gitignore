@@ -11,4 +11,5 @@ ipynb_checkpoints
 *.npz
 *.npy
 *#
+*.zip
 .DS_Store
