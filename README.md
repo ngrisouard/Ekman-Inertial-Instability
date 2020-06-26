@@ -13,7 +13,8 @@ All code, supporting the manuscript "Ekman-Inertial Instability" by Grisouard & 
 * `dedalus_1D.py`: the dedalus script to run a simulation.
 * `EII_plots.py`: python script to plot the results of a simulation and compare it with the analytical solution. This plot can reproduce the figures of the article.
 * `EL_plots.py`: same as `EII_plots.py`, but tuned to the transient Ekman layer solution.
-* `venv_list.txt`: output of `$ conda list`.
+* `venv_list.txt`: output of `$ conda list` for the virtual environment we used.
+* `EII_2020.nb`: Mathematica notebook containing most of the main analytical bottlenecks in the article.
 
 ## Execution
 All commands to execute the dedalus and plotting scripts are gathered in the `run-one-exp.bash` file. Adapt them to your OS or shell as needed, or run as such.
