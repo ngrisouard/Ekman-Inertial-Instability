@@ -136,9 +136,10 @@ A0 = vz0*DE/alpha  # This value has to match what is in Dedalus
 
 hmpth = os.path.expanduser("~")
 figpth = os.path.join(  # EII pics go somewhere
-    hmpth, "Dropbox/Applications/Overleaf/Ekman Inertial Instability/figures")
+    hmpth, "Dropbox/Applications/Overleaf/Ekman-Inertial Instability/figures")
 if not os.path.isdir(figpth):
-    os.mkdir(figpth)
+    raise NameError(
+        'You need to define a path where the figures will be saved')
 
 
 # Warm-up --------------------------------------------------------------------|
@@ -346,7 +347,7 @@ idt, tt = find_nearest(T, instants[2])
 norm = F * abs(Ro) * A0**2 * np.exp(2*tt)
 for ii in range(2):
     ax5[ii].plot(Kt[:, idt]/norm, Z, '-.', color=clrs[2], label='$K_t$')
-    ax5[ii].plot(-LSP[:, idt]/norm, Z, 'k', label='$-LSP$')
+    ax5[ii].plot(-LSP[:, idt]/norm, Z, 'k', label='$-\Pi$')
     ax5[ii].plot(-Phiz[:, idt]/norm, Z, 'k--', label='$-\Phi_z$')
     ax5[ii].plot(-eps[:, idt]/norm, Z, 'k:', label='$-\epsilon$')
     ax5[ii].set_xlabel(r'Units of $|\textrm{Ro}|F A_0^2 e^{-2F t}$')
