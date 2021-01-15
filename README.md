@@ -1,4 +1,4 @@
-# Ekman Inertial Instability
+# Ekman-Inertial Instability
 
 All code, supporting the following manuscript:
 
