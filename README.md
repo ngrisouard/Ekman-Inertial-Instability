@@ -1,6 +1,8 @@
 # Ekman Inertial Instability
 
-All code, supporting the manuscript "Ekman-Inertial Instability" by Grisouard & Zemskova.
+All code, supporting the following manuscript:
+
+> Grisouard N, Zemskova VE. Ekman-inertial instability. Phys Rev Fluids, 5(12):124802. Available from: https://link.aps.org/doi/10.1103/PhysRevFluids.5.124802
 
 ## Pre-requisites
 * All code can run on a personal machine and does not require a supercomputer.
