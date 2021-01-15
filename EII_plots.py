@@ -100,7 +100,7 @@ instants = [0.1, .854, 2., 15.]  # in units of 1/F
 ite = 30  # iteration to display the early stage of instability
 
 ftsz = 12
-saveYN = False  # set True to print pics (will have to change the figpath)
+saveYN = True  # set True to print pics (you will have to change the figpath)
 dpi = 150
 
 mf = tckr.ScalarFormatter(useMathText=True)
